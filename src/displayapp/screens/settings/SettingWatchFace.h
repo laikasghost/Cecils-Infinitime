@@ -9,8 +9,8 @@
 #include "displayapp/screens/Screen.h"
 #include "displayapp/screens/Symbols.h"
 #include "displayapp/screens/CheckboxList.h"
-#include "displayapp/screens/WatchFaceInfineat.h"
 #include "displayapp/screens/WatchFaceCasioStyleG7710.h"
+#include "displayapp/screens/WatchFaceInfineat.h"
 
 namespace Pinetime {
 
@@ -44,7 +44,7 @@ namespace Pinetime {
         Controllers::Settings& settingsController;
         Pinetime::Controllers::FS& filesystem;
 
-        static constexpr const char* title = "Watch face";
+        static constexpr const char* title = "Watch Face";
         static constexpr const char* symbol = Symbols::home;
 
         ScreenList<nScreens> screens;

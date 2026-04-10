@@ -367,12 +367,12 @@ namespace Pinetime {
         WeatherFormat weatherFormat = WeatherFormat::Metric;
         Notification notificationStatus = Notification::On;
 
-        Pinetime::Applications::WatchFace watchFace = Pinetime::Applications::WatchFace::Digital;
+        Pinetime::Applications::WatchFace watchFace = Pinetime::Applications::WatchFace::Cecil;
         ChimesOption chimesOption = ChimesOption::None;
 
         PineTimeStyle PTS;
 
-        PrideFlag prideFlag = PrideFlag::Gay;
+        PrideFlag prideFlag = PrideFlag::Trans;
 
         WatchFaceInfineat watchFaceInfineat;
 

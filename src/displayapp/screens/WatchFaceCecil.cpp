@@ -1,5 +1,5 @@
 #include <lvgl/lvgl.h>
-#include "displayapp/screens/WatchFaceTerminal.h"
+#include "displayapp/screens/WatchFaceCecil.h"
 #include "displayapp/screens/BatteryIcon.h"
 #include "components/battery/BatteryController.h"
 #include "components/ble/BleController.h"
@@ -13,7 +13,7 @@
 
 using namespace Pinetime::Applications::Screens;
 
-WatchFaceTerminal::WatchFaceTerminal(Controllers::DateTime& dateTimeController,
+WatchFaceCecil::WatchFaceCecil(Controllers::DateTime& dateTimeController,
                                      const Controllers::Battery& batteryController,
                                      const Controllers::Ble& bleController,
                                      Controllers::NotificationManager& notificationManager,
@@ -31,17 +31,19 @@ WatchFaceTerminal::WatchFaceTerminal(Controllers::DateTime& dateTimeController,
     motionController {motionController},
     weatherService {weatherService} {
 
+  constexpr lv_color_t mossGreen = LV_COLOR_MAKE(0x4B, 0x66, 0x1b);
+  constexpr lv_color_t goldenrod = LV_COLOR_MAKE(0xdf, 0xba, 0x00);
+  
   container = lv_cont_create(lv_scr_act(), nullptr);
   lv_cont_set_layout(container, LV_LAYOUT_COLUMN_LEFT);
   lv_cont_set_fit(container, LV_FIT_TIGHT);
   lv_obj_set_style_local_pad_inner(container, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, -3);
-  lv_obj_set_style_local_bg_opa(container, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-
-  notificationIcon = lv_label_create(container, nullptr);
+  //lv_obj_set_style_local_bg_opa(container, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+   lv_obj_set_style_local_bg_color(container, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, mossGreen);
 
   labelPrompt1 = lv_label_create(container, nullptr);
-  lv_obj_set_style_local_text_color(labelPrompt1, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, Colors::lightGray);
-  lv_label_set_text_static(labelPrompt1, "cecil@watch:~$");
+  lv_obj_set_style_local_text_color(labelPrompt1, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, goldenrod);
+  lv_label_set_text_static(labelPrompt1, "       >^o.o^<\n");
 
   labelTime = lv_label_create(container, nullptr);
   lv_label_set_recolor(labelTime, true);
@@ -54,7 +56,7 @@ WatchFaceTerminal::WatchFaceTerminal(Controllers::DateTime& dateTimeController,
 
   stepValue = lv_label_create(container, nullptr);
   lv_label_set_recolor(stepValue, true);
-  lv_obj_set_style_local_text_color(stepValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, Colors::orange);
+  lv_obj_set_style_local_text_color(stepValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, Colors::green);
 
   heartbeatValue = lv_label_create(container, nullptr);
   lv_label_set_recolor(heartbeatValue, true);
@@ -66,8 +68,8 @@ WatchFaceTerminal::WatchFaceTerminal(Controllers::DateTime& dateTimeController,
   lv_label_set_recolor(connectState, true);
 
   labelPrompt2 = lv_label_create(container, nullptr);
-  lv_obj_set_style_local_text_color(labelPrompt2, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, Colors::lightGray);
-  lv_label_set_text_static(labelPrompt2, "cecil@watch:~$");
+  lv_obj_set_style_local_text_color(labelPrompt2, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, goldenrod);
+  lv_label_set_text_static(labelPrompt2, "\n       >^o.o^<");
 
   lv_obj_align(container, nullptr, LV_ALIGN_IN_TOP_LEFT, 0, 7);
 
@@ -75,21 +77,12 @@ WatchFaceTerminal::WatchFaceTerminal(Controllers::DateTime& dateTimeController,
   Refresh();
 }
 
-WatchFaceTerminal::~WatchFaceTerminal() {
+WatchFaceCecil::~WatchFaceCecil() {
   lv_task_del(taskRefresh);
   lv_obj_clean(lv_scr_act());
 }
 
-void WatchFaceTerminal::Refresh() {
-  notificationState = notificationManager.AreNewNotificationsAvailable();
-  if (notificationState.IsUpdated()) {
-    if (notificationState.Get()) {
-      lv_label_set_text_static(notificationIcon, "[1]+ Notify");
-    } else {
-      lv_label_set_text_static(notificationIcon, "");
-    }
-  }
-
+void WatchFaceCecil::Refresh() {
   currentDateTime = std::chrono::time_point_cast<std::chrono::seconds>(dateTimeController.CurrentDateTime());
   if (currentDateTime.IsUpdated()) {
     uint8_t hour = dateTimeController.Hours();
@@ -106,9 +99,9 @@ void WatchFaceTerminal::Refresh() {
         hour = hour - 12;
         ampmChar[0] = 'P';
       }
-      lv_label_set_text_fmt(labelTime, "#ffffff [TIME]# #11cc55 %02d:%02d:%02d %s#", hour, minute, second, ampmChar);
+      lv_label_set_text_fmt(labelTime, "#DFBA00 [TIME]# #ffffff %02d:%02d:%02d %s#", hour, minute, second, ampmChar);
     } else {
-      lv_label_set_text_fmt(labelTime, "#ffffff [TIME]# #11cc55 %02d:%02d:%02d#", hour, minute, second);
+      lv_label_set_text_fmt(labelTime, "#DFBA00 [TIME]# #ffffff %02d:%02d:%02d#", hour, minute, second);
     }
 
     currentDate = std::chrono::time_point_cast<std::chrono::days>(currentDateTime.Get());
@@ -116,7 +109,7 @@ void WatchFaceTerminal::Refresh() {
       uint16_t year = dateTimeController.Year();
       Controllers::DateTime::Months month = dateTimeController.Month();
       uint8_t day = dateTimeController.Day();
-      lv_label_set_text_fmt(labelDate, "#ffffff [DATE]# #007fff %04d-%02d-%02d#", year, month, day);
+      lv_label_set_text_fmt(labelDate, "#DFBA00 [DATE]# #ffffff %04d-%02d-%02d#", year, month, day);
     }
   }
 
@@ -127,7 +120,7 @@ void WatchFaceTerminal::Refresh() {
                                       LV_LABEL_PART_MAIN,
                                       LV_STATE_DEFAULT,
                                       BatteryIcon::ColorFromPercentage(batteryPercentRemaining.Get()));
-    lv_label_set_text_fmt(batteryValue, "#ffffff [BATT]# %d%%", batteryPercentRemaining.Get());
+    lv_label_set_text_fmt(batteryValue, "#DFBA00 [BATT]# %d%%", batteryPercentRemaining.Get());
     if (batteryController.IsCharging()) {
       lv_label_ins_text(batteryValue, LV_LABEL_POS_LAST, " Charging");
     }
@@ -135,7 +128,7 @@ void WatchFaceTerminal::Refresh() {
 
   stepCount = motionController.NbSteps();
   if (stepCount.IsUpdated()) {
-    lv_label_set_text_fmt(stepValue, "#ffffff [STEP]# %lu steps", stepCount.Get());
+    lv_label_set_text_fmt(stepValue, "#DFBA00 [STEP]# %lu steps", stepCount.Get());
   }
 
   heartbeat = heartRateController.HeartRate();
@@ -143,9 +136,9 @@ void WatchFaceTerminal::Refresh() {
   if (heartbeat.IsUpdated() || heartbeatRunning.IsUpdated()) {
     if (heartbeatRunning.Get()) {
       lv_obj_set_style_local_text_color(heartbeatValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, Colors::deepOrange);
-      lv_label_set_text_fmt(heartbeatValue, "#ffffff [HTRT]# %d bpm", heartbeat.Get());
+      lv_label_set_text_fmt(heartbeatValue, "#DFBA00 [HTRT]# %d bpm", heartbeat.Get());
     } else {
-      lv_label_set_text_static(heartbeatValue, "#ffffff [HTRT]# ---");
+      lv_label_set_text_static(heartbeatValue, "#DFBA00 [HTRT]# ---");
       lv_obj_set_style_local_text_color(heartbeatValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, Colors::gray);
     }
   }
@@ -161,12 +154,12 @@ void WatchFaceTerminal::Refresh() {
         tempUnit = 'F';
       }
       lv_label_set_text_fmt(weather,
-                            "#ffffff [WTHR]# #ffdd00 %d°%c %s#",
+                            "#DFBA00 [WTHR]# #ffffff %d°%c %s#",
                             temp,
                             tempUnit,
                             Symbols::GetSimpleCondition(optCurrentWeather->iconId));
     } else {
-      lv_label_set_text(weather, "#ffffff [WTHR]# #ffdd00 ---");
+      lv_label_set_text(weather, "#DFBA00 [WTHR]# #ffffff ---");
     }
   }
 
@@ -174,14 +167,14 @@ void WatchFaceTerminal::Refresh() {
   bleRadioEnabled = bleController.IsRadioEnabled();
   if (bleState.IsUpdated() || bleRadioEnabled.IsUpdated()) {
     if (!bleRadioEnabled.Get()) {
-      lv_label_set_text_static(connectState, "#ffffff [BLUT]# Disabled");
+      lv_label_set_text_static(connectState, "#DFBA00 [BLUT]# Disabled");
       lv_obj_set_style_local_text_color(connectState, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, Colors::gray);
     } else {
       if (bleState.Get()) {
-        lv_label_set_text_static(connectState, "#ffffff [BLUT]# Connected");
+        lv_label_set_text_static(connectState, "#DFBA00 [BLUT]# Connected");
         lv_obj_set_style_local_text_color(connectState, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, Colors::blue);
       } else {
-        lv_label_set_text_static(connectState, "#ffffff [BLUT]# Disconnected");
+        lv_label_set_text_static(connectState, "#DFBA00 [BLUT]# Disconnected");
         lv_obj_set_style_local_text_color(connectState, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, Colors::gray);
       }
     }
