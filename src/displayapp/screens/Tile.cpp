@@ -68,11 +68,15 @@ Tile::Tile(uint8_t screenID,
   lv_btnmatrix_set_map(btnm1, btnmMap);
   lv_obj_set_size(btnm1, LV_HOR_RES - 16, LV_VER_RES - 60);
   lv_obj_align(btnm1, nullptr, LV_ALIGN_CENTER, 0, 10);
-
+  //make screen and button matrix background transparent
+  lv_obj_set_style_local_bg_opa(lv_scr_act(), LV_OBJMASK_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+  lv_obj_set_style_local_bg_opa(btnm1, LV_BTNMATRIX_PART_BG, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+  //set button radius and color
   lv_obj_set_style_local_radius(btnm1, LV_BTNMATRIX_PART_BTN, LV_STATE_DEFAULT, 20);
-  lv_obj_set_style_local_bg_color(btnm1, LV_BTNMATRIX_PART_BTN, LV_STATE_DEFAULT, Colors::bgAlt);
+  lv_obj_set_style_local_bg_color(btnm1, LV_BTNMATRIX_PART_BTN, LV_STATE_DEFAULT, color_button);
+  //this background color/opacity applies to disabled buttons
   lv_obj_set_style_local_bg_opa(btnm1, LV_BTNMATRIX_PART_BTN, LV_STATE_DISABLED, LV_OPA_50);
-  lv_obj_set_style_local_bg_color(btnm1, LV_BTNMATRIX_PART_BTN, LV_STATE_DISABLED, Colors::bgDark);
+  lv_obj_set_style_local_bg_color(btnm1, LV_BTNMATRIX_PART_BTN, LV_STATE_DISABLED, color_button);
   lv_obj_set_style_local_pad_all(btnm1, LV_BTNMATRIX_PART_BG, LV_STATE_DEFAULT, 0);
   lv_obj_set_style_local_pad_inner(btnm1, LV_BTNMATRIX_PART_BG, LV_STATE_DEFAULT, 10);
 
