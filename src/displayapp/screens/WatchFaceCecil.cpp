@@ -12,6 +12,8 @@
 #include "components/heartrate/HeartRateController.h"
 #include "components/motion/MotionController.h"
 #include "components/settings/Settings.h"
+#include "components/ble/SimpleWeatherService.h"
+#include "displayapp/screens/WeatherSymbols.h"
 
 #include <stdio.h>
 using namespace Pinetime::Applications::Screens;
@@ -23,6 +25,7 @@ WatchFaceCecil::WatchFaceCecil(Controllers::DateTime& dateTimeController,
                                                    Controllers::Settings& settingsController,
                                                    Controllers::HeartRateController& heartRateController,
                                                    Controllers::MotionController& motionController,
+                                                   Controllers::SimpleWeatherService& weatherService,
                                                    Controllers::FS& filesystem)
   : currentDateTime {{}},
     batteryIcon(false),
@@ -32,7 +35,8 @@ WatchFaceCecil::WatchFaceCecil(Controllers::DateTime& dateTimeController,
     notificatioManager {notificatioManager},
     settingsController {settingsController},
     heartRateController {heartRateController},
-    motionController {motionController} {
+    motionController {motionController},
+    weatherService {weatherService} {
 
   lfs_file f = {};
   if (filesystem.FileOpen(&f, "/fonts/lv_font_dots_40.bin", LFS_O_RDONLY) >= 0) {
@@ -88,12 +92,12 @@ WatchFaceCecil::WatchFaceCecil(Controllers::DateTime& dateTimeController,
   lv_obj_set_style_local_text_color(label_week_number, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_text);
   lv_obj_set_style_local_text_font(label_week_number, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, font_dot40);
   lv_label_set_text_static(label_week_number, "WK26");
-
-  label_day_of_year = lv_label_create(lv_scr_act(), nullptr);
-  lv_obj_align(label_day_of_year, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 120, 30);
-  lv_obj_set_style_local_text_color(label_day_of_year, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_text);
-  lv_obj_set_style_local_text_font(label_day_of_year, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, font_dot40);
-  lv_label_set_text_static(label_day_of_year, "D184");
+  
+  label_weather = lv_label_create(lv_scr_act(), nullptr);
+  lv_obj_align(label_weather, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 100, 30);
+  lv_obj_set_style_local_text_color(label_weather, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_text);
+  lv_obj_set_style_local_text_font(label_weather, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, font_segment40);
+  lv_label_set_text_static(label_weather, "9C");
 
   lv_style_init(&style_line);
   lv_style_set_line_width(&style_line, LV_STATE_DEFAULT, 2);
@@ -250,7 +254,6 @@ void WatchFaceCecil::Refresh() {
 
       Controllers::DateTime::Months month = dateTimeController.Month();
       uint8_t day = dateTimeController.Day();
-      int dayOfYear = dateTimeController.DayOfYear();
       if (settingsController.GetClockType() == Controllers::Settings::ClockType::H24) {
         // 24h mode: mmddyyyy, first DOW=Monday;
         lv_label_set_text_fmt(label_date, "%3d-%2d", month, day);
@@ -274,15 +277,35 @@ void WatchFaceCecil::Refresh() {
       uint8_t weekNumber = atoi(buffer);
 
       lv_label_set_text_fmt(label_day_of_week, "%s", dateTimeController.DayOfWeekShortToString());
-      lv_label_set_text_fmt(label_day_of_year, "D%3d", dayOfYear);
       lv_label_set_text_fmt(label_week_number, "WK%02d", weekNumber);
 
       lv_obj_realign(label_day_of_week);
-      lv_obj_realign(label_day_of_year);
       lv_obj_realign(label_week_number);
       lv_obj_realign(label_date);
     }
   }
+  
+  currentWeather = weatherService.Current();
+  if (currentWeather.IsUpdated()) {
+    auto optCurrentWeather = currentWeather.Get();
+    if (optCurrentWeather) {
+      int16_t temp = optCurrentWeather->temperature.Celsius();
+      char tempUnit = 'C';
+      if (settingsController.GetWeatherFormat() == Controllers::Settings::WeatherFormat::Imperial) {
+        temp = optCurrentWeather->temperature.Fahrenheit();
+        tempUnit = 'F';
+      }
+      lv_label_set_text_fmt(label_weather,
+                            "%s%d%c",
+                            Symbols::GetSimpleCondition(optCurrentWeather->iconId),
+                            temp,
+                            tempUnit);
+    } else {
+      lv_label_set_text(label_weather, "---");
+    }
+  }
+  
+  lv_obj_realign(label_weather);
 
   heartbeat = heartRateController.HeartRate();
   heartbeatRunning = heartRateController.State() != Controllers::HeartRateController::States::Stopped;
