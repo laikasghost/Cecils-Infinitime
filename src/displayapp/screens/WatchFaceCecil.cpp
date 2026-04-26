@@ -23,6 +23,11 @@
 #include <stdio.h>
 using namespace Pinetime::Applications::Screens;
 
+lv_color_t color_main = lv_color_hex(0xA84532); //main text color: clay
+lv_color_t color_secondary = lv_color_hex(0xD8F0FE); //secondary color: text shadows, etc?: white/v light blue
+lv_color_t color_background = lv_color_hex(0x7EBCE1); //sky blue
+lv_color_t color_contrast_background = lv_color_hex(0x3C668A); //duller sky blue
+
 void alignShadowLabelRandom(lv_obj_t* mainLabel, lv_obj_t* shadowLabel) {
   int rand1 = rand() % 15 - 7;
   int rand2 = rand() % 15 - 7;
@@ -48,19 +53,19 @@ lv_obj_t* createShadowContainer(lv_obj_t* parentContainer) {
   return container;
 }
 
-lv_obj_t* createShadowLabel(lv_obj_t* shadowContainer, lv_color_t color) {
+lv_obj_t* createShadowLabel(lv_obj_t* shadowContainer) {
   lv_obj_t* shadowLabel = lv_label_create(lv_scr_act(), nullptr);
   lv_obj_set_parent(shadowLabel, shadowContainer);
-  lv_obj_set_style_local_text_color(shadowLabel, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color);
+  lv_obj_set_style_local_text_color(shadowLabel, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_secondary);
   lv_obj_set_style_local_text_font(shadowLabel, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &pixel_30);
   return shadowLabel;
 }
 
-lv_obj_t* createMainLabel(lv_obj_t* shadowLabel, lv_color_t color) {
+lv_obj_t* createMainLabel(lv_obj_t* shadowLabel) {
   lv_obj_t* mainLabel = lv_label_create(lv_scr_act(), nullptr);
   lv_obj_t* shadowContainer = lv_obj_get_parent(shadowLabel);
   lv_obj_set_parent(mainLabel, shadowContainer);
-  lv_obj_set_style_local_text_color(mainLabel, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color);
+  lv_obj_set_style_local_text_color(mainLabel, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_main);
   lv_obj_set_style_local_text_font(mainLabel, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &pixel_30);
   alignShadowLabelConsistent(mainLabel, shadowLabel);
   return mainLabel;
@@ -68,7 +73,7 @@ lv_obj_t* createMainLabel(lv_obj_t* shadowLabel, lv_color_t color) {
 
 //this doesn't work and i don't know why, maybe something about the parent container's alignment
 void timeJitter(lv_obj_t* timeContainer) {
-  int rand1 = rand() % 3;
+  int rand1 = rand() % 5;
   lv_obj_set_style_local_pad_top(timeContainer, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, rand1);
 }
 
@@ -102,7 +107,7 @@ WatchFaceCecil::WatchFaceCecil(Controllers::DateTime& dateTimeController,
 
   //maybe find a better way to set background color, idk
   lv_obj_set_style_local_bg_opa(lv_scr_act(), LV_OBJMASK_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-  lv_disp_set_bg_color(NULL, color_background);
+  lv_disp_set_bg_color(NULL, color_background);//this is color_background, won't work if i just put the var, idk why
   
   //parent container for all the other objects
   big_container = lv_cont_create(lv_scr_act(), nullptr);
@@ -120,11 +125,12 @@ WatchFaceCecil::WatchFaceCecil(Controllers::DateTime& dateTimeController,
   lv_obj_align(battery_bar, lv_scr_act(), LV_ALIGN_IN_TOP_LEFT, 0, 0);
   lv_obj_set_size(battery_bar, 240, 30);
   lv_obj_set_style_local_bg_opa(battery_bar, LV_BAR_PART_BG, LV_STATE_DEFAULT, LV_OPA_20);
-  lv_obj_set_style_local_bg_color(battery_bar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, color_text);
+  lv_obj_set_style_local_bg_color(battery_bar, LV_BAR_PART_BG, LV_STATE_DEFAULT, color_contrast_background);
+  lv_obj_set_style_local_bg_color(battery_bar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, color_contrast_background);
   lv_obj_set_style_local_radius(battery_bar, LV_BAR_PART_BG, LV_STATE_DEFAULT, 0);
   lv_obj_set_style_local_radius(battery_bar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, 0);
   lv_obj_set_style_local_margin_all(battery_bar, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 0);
- lv_obj_set_style_local_pad_all(battery_bar, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 0);
+  lv_obj_set_style_local_pad_all(battery_bar, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 3);
   
   //container for middle section objects
   middle_container = lv_cont_create(lv_scr_act(), nullptr);
@@ -138,24 +144,26 @@ WatchFaceCecil::WatchFaceCecil(Controllers::DateTime& dateTimeController,
   lv_obj_set_style_local_pad_all(middle_container, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 6);
   
   //container for bottom bar objects
-  bot_bar_container = lv_cont_create(lv_scr_act(), nullptr);
-  lv_obj_set_parent(bot_bar_container, big_container);
-  lv_obj_set_size(bot_bar_container, 240, 30);
-  lv_obj_align(bot_bar_container, lv_scr_act(), LV_ALIGN_IN_BOTTOM_RIGHT, 0, 0);
-  lv_cont_set_layout(bot_bar_container, LV_LAYOUT_OFF);
-  lv_cont_set_fit2(bot_bar_container, LV_FIT_MAX, LV_FIT_TIGHT); //as wide as parent, vertically tight to children
-  lv_obj_set_style_local_bg_opa(bot_bar_container, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_20);
-  lv_obj_set_style_local_radius(bot_bar_container, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, 0);
-  lv_obj_set_style_local_pad_inner(bot_bar_container, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 3);
-  lv_obj_set_style_local_margin_all(bot_bar_container, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 0);
-  lv_obj_set_style_local_pad_all(bot_bar_container, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 6);
+  steps_bar = lv_bar_create(lv_scr_act(), nullptr);
+  lv_obj_set_parent(steps_bar, big_container);
+  lv_obj_align(steps_bar, lv_scr_act(), LV_ALIGN_IN_BOTTOM_LEFT, 0, -20);
+  lv_obj_set_size(steps_bar, 240, 30);
+  lv_cont_set_layout(steps_bar, LV_LAYOUT_ROW_MID);
+  lv_obj_set_style_local_bg_opa(steps_bar, LV_BAR_PART_BG, LV_STATE_DEFAULT, LV_OPA_20);
+  lv_obj_set_style_local_bg_color(steps_bar, LV_BAR_PART_BG, LV_STATE_DEFAULT, color_contrast_background);
+  lv_obj_set_style_local_bg_color(steps_bar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, color_contrast_background);
+  lv_obj_set_style_local_radius(steps_bar, LV_BAR_PART_BG, LV_STATE_DEFAULT, 0);
+  lv_obj_set_style_local_radius(steps_bar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, 0);
+  lv_obj_set_style_local_margin_all(steps_bar, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 0);
+  lv_obj_set_style_local_pad_all(steps_bar, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 3);
+  lv_bar_set_range(steps_bar, 0, 6000);
   
   //top bar/battery bar items
   //create bluetooth icon
   bleIcon = lv_label_create(lv_scr_act(), nullptr);
   lv_obj_set_parent(bleIcon, battery_bar);
   lv_obj_align(bleIcon, battery_bar, LV_ALIGN_IN_RIGHT_MID, -6, 0);
-  lv_obj_set_style_local_text_color(bleIcon, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_line);
+  lv_obj_set_style_local_text_color(bleIcon, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_main);
   lv_label_set_text_static(bleIcon, Symbols::bluetooth);
   
   //middle section items
@@ -174,20 +182,20 @@ WatchFaceCecil::WatchFaceCecil(Controllers::DateTime& dateTimeController,
   //day of week shadow container
   day_container = createShadowContainer(date_info_container);
   //create day of week shadow label
-  label_day_shadow = createShadowLabel(day_container, color_line);
+  label_day_shadow = createShadowLabel(day_container);
   lv_label_set_text_static(label_day_shadow, "SUN");
   //create day of week label
-  label_day = createMainLabel(label_day_shadow, color_text);
+  label_day = createMainLabel(label_day_shadow);
   //---END DAY OF WEEK
   
   //DATE ---
   //create date container
   date_container = createShadowContainer(date_info_container);
   //create date shadow label
-  label_date_shadow = createShadowLabel(date_container, color_line);
+  label_date_shadow = createShadowLabel(date_container);
   lv_label_set_text_static(label_date_shadow, "6/30");
   //create date label
-  label_date = createMainLabel(label_date_shadow, color_text);
+  label_date = createMainLabel(label_date_shadow);
   //---END DATE
 
   /*
@@ -207,20 +215,20 @@ WatchFaceCecil::WatchFaceCecil(Controllers::DateTime& dateTimeController,
   //create weather shadow container
   weather_container = createShadowContainer(middle_container);
   //create weather shadow label
-  label_weather_shadow = createShadowLabel(weather_container, color_line);
+  label_weather_shadow = createShadowLabel(weather_container);
   lv_label_set_text_static(label_weather_shadow, "9C");
   //create weather label
-  label_weather = createMainLabel(label_weather_shadow, color_text);
+  label_weather = createMainLabel(label_weather_shadow);
   //---END WEATHER
 
   //TIME ---
   //create time label container
   time_container = createShadowContainer(middle_container);
   //create time shadow label
-  label_time_shadow = createShadowLabel(time_container, color_line);
+  label_time_shadow = createShadowLabel(time_container);
   lv_obj_set_style_local_text_font(label_time_shadow, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &bubble_80);
   //create time label
-  label_time = createMainLabel(label_time_shadow, color_text);
+  label_time = createMainLabel(label_time_shadow);
   lv_obj_set_style_local_text_font(label_time, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &bubble_80);
   lv_label_set_text_static(label_time, "08:34");
   alignShadowLabelRandom(label_time, label_time_shadow);
@@ -229,37 +237,40 @@ WatchFaceCecil::WatchFaceCecil(Controllers::DateTime& dateTimeController,
   //bottom bar items
   //HEARTBEAT---
   //create heartbeat info container
-  heartbeat_container = createShadowContainer(bot_bar_container);
+  heartbeat_container = createShadowContainer(steps_bar);
   lv_cont_set_layout(heartbeat_container, LV_LAYOUT_ROW_MID);
-  lv_obj_align(heartbeat_container, bot_bar_container, LV_ALIGN_IN_LEFT_MID, 6, 0);
+  lv_obj_align(heartbeat_container, steps_bar, LV_ALIGN_IN_LEFT_MID, 6, 0);
+  lv_obj_set_style_local_pad_inner(heartbeat_container, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, 3);
+  lv_obj_set_style_local_margin_left(heartbeat_container, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, 6);
   //create heartbeat icon label
   heartbeatIcon = lv_label_create(lv_scr_act(), nullptr);
   lv_obj_set_parent(heartbeatIcon, heartbeat_container);
   lv_label_set_text_static(heartbeatIcon, Symbols::heartBeat);
-  lv_obj_set_style_local_text_color(heartbeatIcon, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_text);
+  lv_obj_set_style_local_text_color(heartbeatIcon, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_main);
   //create heartbeat value label
   heartbeatValue = lv_label_create(lv_scr_act(), nullptr);
   lv_obj_set_parent(heartbeatValue, heartbeat_container);
-  lv_obj_set_style_local_text_color(heartbeatValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_text);
+  lv_obj_set_style_local_text_color(heartbeatValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_main);
   lv_obj_set_style_local_text_font(heartbeatValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &pixel_20);
   lv_label_set_text_static(heartbeatValue, "");
   //---END HEARTBEAT
 
   //STEPS---
   //create step info container
-  step_container = createShadowContainer(bot_bar_container);
+  step_container = createShadowContainer(steps_bar);
   lv_cont_set_layout(step_container, LV_LAYOUT_ROW_MID);
-  lv_obj_align(step_container, bot_bar_container, LV_ALIGN_IN_RIGHT_MID, -6, 0);
+  lv_obj_align(step_container, steps_bar, LV_ALIGN_IN_RIGHT_MID, -20, 0);
+  lv_obj_set_style_local_pad_inner(step_container, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, 3);
+  lv_obj_set_style_local_margin_right(step_container, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, 6);
   //create step icon label
   stepIcon = lv_label_create(lv_scr_act(), nullptr);
   lv_obj_set_parent(stepIcon, step_container);
-  lv_obj_set_style_local_text_color(stepIcon, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_text);
+  lv_obj_set_style_local_text_color(stepIcon, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_main);
   lv_label_set_text_static(stepIcon, Symbols::shoe);
-
   //create step value label
   stepValue = lv_label_create(lv_scr_act(), nullptr);
   lv_obj_set_parent(stepValue, step_container);
-  lv_obj_set_style_local_text_color(stepValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_text);
+  lv_obj_set_style_local_text_color(stepValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_main);
   lv_obj_set_style_local_text_font(stepValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &pixel_20);
   lv_label_set_text_static(stepValue, "0");
   //---END STEPS
@@ -287,9 +298,9 @@ void WatchFaceCecil::Refresh() {
   powerPresent = batteryController.IsPowerPresent();
   if (powerPresent.IsUpdated()) {
     if (batteryController.IsPowerPresent()) {
-      lv_obj_set_style_local_bg_color(battery_bar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, color_line);
+      lv_obj_set_style_local_bg_color(battery_bar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, color_secondary);
     } else {
-      lv_obj_set_style_local_bg_color(battery_bar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, color_text);
+      lv_obj_set_style_local_bg_color(battery_bar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, color_contrast_background);
     }
   }
 
@@ -386,11 +397,11 @@ void WatchFaceCecil::Refresh() {
   heartbeatRunning = heartRateController.State() != Controllers::HeartRateController::States::Stopped;
   if (heartbeat.IsUpdated() || heartbeatRunning.IsUpdated()) {
     if (heartbeatRunning.Get()) {
-      lv_obj_set_style_local_text_color(heartbeatIcon, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_text);
       lv_label_set_text_fmt(heartbeatValue, "%d", heartbeat.Get());
+      lv_obj_set_style_local_text_color(heartbeatValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_main);
     } else {
-      lv_obj_set_style_local_text_color(heartbeatIcon, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, lv_color_hex(0x405E26));
       lv_label_set_text_static(heartbeatValue, "");
+      lv_obj_set_style_local_text_color(heartbeatValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_background);
     }
 
     lv_obj_realign(heartbeatIcon);
@@ -400,6 +411,11 @@ void WatchFaceCecil::Refresh() {
   stepCount = motionController.GetTripSteps();
   if (stepCount.IsUpdated()) {
     lv_label_set_text_fmt(stepValue, "%lu", stepCount.Get());
+    if (stepCount.Get() <= 6000) {
+      lv_bar_set_value(steps_bar, stepCount.Get(), LV_ANIM_OFF);
+    } else {
+      lv_bar_set_value(steps_bar, 6000, LV_ANIM_OFF);
+    }
     lv_obj_realign(stepValue);
     lv_obj_realign(stepIcon);
   }

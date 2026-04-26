@@ -46,7 +46,7 @@ namespace Pinetime {
         lv_obj_t* label_time;
         lv_obj_t* btnm1;
         
-        lv_color_t color_button = lv_color_hex(0x274D06);
+        lv_color_t color_button = lv_color_hex(0x3C668A);
 
         Widgets::PageIndicator pageIndicator;
         Widgets::StatusIcons statusIcons;

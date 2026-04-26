@@ -56,16 +56,16 @@ namespace Pinetime {
         Utility::DirtyValue<std::chrono::time_point<std::chrono::system_clock, std::chrono::days>> currentDate;
         Utility::DirtyValue<std::optional<Controllers::SimpleWeatherService::CurrentWeather>> currentWeather {};
 
-        lv_color_t color_text = lv_color_hex(0xD9F9BD);
-        lv_color_t color_line = lv_color_hex(0xF5CF39);
-        lv_color_t color_background = lv_color_hex(0x193302);
+        lv_color_t color_main = lv_color_hex(0xA84532); //main text color: clay
+        lv_color_t color_secondary = lv_color_hex(0xD8F0FE); //secondary color: text shadows, etc?: white/v light blue
+        lv_color_t color_background = lv_color_hex(0x7EBCE1); //sky blue
+        lv_color_t color_contrast_background = lv_color_hex(0x3C668A); //duller sky blue
         
         lv_style_t style_line;
         lv_style_t style_border;
 
         lv_obj_t* big_container;
         lv_obj_t* middle_container;
-        lv_obj_t* bot_bar_container;
         lv_obj_t* batt_info_container;
         lv_obj_t* date_info_container;
         lv_obj_t* time_container;
@@ -93,8 +93,11 @@ namespace Pinetime {
         lv_obj_t* step_container;
         lv_obj_t* stepIcon;
         lv_obj_t* stepValue;
+        lv_obj_t* steps_bar;
         lv_obj_t* notificationIcon;
         lv_obj_t* weather;
+
+        int stepsGoal = 6000;
 
         BatteryIcon batteryIcon;
 
@@ -134,8 +137,8 @@ namespace Pinetime {
       };
 
       lv_obj_t* createShadowContainer(lv_obj_t*);
-      lv_obj_t* createMainLabel(lv_obj_t*, lv_color_t);
-      lv_obj_t* createShadowLabel(lv_obj_t*, lv_color_t);
+      lv_obj_t* createMainLabel(lv_obj_t*);
+      lv_obj_t* createShadowLabel(lv_obj_t*);
       
       void alignShadowLabelRandom(lv_obj_t*, lv_obj_t*);
       void alignShadowLabelConsistent(lv_obj_t*, lv_obj_t*);

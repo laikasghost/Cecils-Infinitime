@@ -23,4 +23,7 @@ ADDING A FONT:
 		    },
 		    
 	- In src/displayapp/fonts/CMakeLists.txt, add font name to list of fonts on line 1 (function set(FONTS args))
+
+CHANGE BUTTON COLORS IN APPLICATION LIST:
+	Change lv_color_t color_button in src/displayapp/screens/Tile.h
 	    
