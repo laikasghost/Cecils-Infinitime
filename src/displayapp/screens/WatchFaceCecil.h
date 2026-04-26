@@ -56,12 +56,6 @@ namespace Pinetime {
         Utility::DirtyValue<std::chrono::time_point<std::chrono::system_clock, std::chrono::days>> currentDate;
         Utility::DirtyValue<std::optional<Controllers::SimpleWeatherService::CurrentWeather>> currentWeather {};
 
-        lv_point_t line_icons_points[3] {{0, 5}, {117, 5}, {122, 0}};
-        lv_point_t line_day_of_week_number_points[4] {{0, 0}, {100, 0}, {95, 95}, {0, 95}};
-        lv_point_t line_day_of_year_points[3] {{0, 5}, {130, 5}, {135, 0}};
-        lv_point_t line_date_points[3] {{0, 5}, {135, 5}, {140, 0}};
-        lv_point_t line_time_points[3] {{0, 0}, {230, 0}, {235, 5}};
-
         lv_color_t color_text = lv_color_hex(0xD9F9BD);
         lv_color_t color_line = lv_color_hex(0xF5CF39);
         lv_color_t color_background = lv_color_hex(0x193302);
@@ -69,26 +63,37 @@ namespace Pinetime {
         lv_style_t style_line;
         lv_style_t style_border;
 
+        lv_obj_t* big_container;
+        lv_obj_t* middle_container;
+        lv_obj_t* bot_bar_container;
+        lv_obj_t* batt_info_container;
+        lv_obj_t* date_info_container;
+        lv_obj_t* time_container;
         lv_obj_t* label_time;
-        lv_obj_t* line_time;
-        lv_obj_t* label_time_ampm;
+        lv_obj_t* label_time_shadow;
+        lv_obj_t* date_container;
         lv_obj_t* label_date;
-        lv_obj_t* line_date;
-        lv_obj_t* label_day_of_week;
-        lv_obj_t* label_week_number;
-        lv_obj_t* line_day_of_week_number;
+        lv_obj_t* label_date_shadow;
+        lv_obj_t* day_container;
+        lv_obj_t* label_day;
+        lv_obj_t* label_day_shadow;
+        lv_obj_t* week_container;
+        lv_obj_t* label_week;
+        lv_obj_t* label_week_shadow;
+        lv_obj_t* weather_container;
         lv_obj_t* label_weather;
-        lv_obj_t* line_day_of_year;
-        lv_obj_t* backgroundLabel;
+        lv_obj_t* label_weather_shadow;
         lv_obj_t* bleIcon;
         lv_obj_t* batteryPlug;
+        lv_obj_t* battery_bar;
         lv_obj_t* label_battery_value;
+        lv_obj_t* heartbeat_container;
         lv_obj_t* heartbeatIcon;
         lv_obj_t* heartbeatValue;
+        lv_obj_t* step_container;
         lv_obj_t* stepIcon;
         lv_obj_t* stepValue;
         lv_obj_t* notificationIcon;
-        lv_obj_t* line_icons;
         lv_obj_t* weather;
 
         BatteryIcon batteryIcon;
@@ -103,9 +108,11 @@ namespace Pinetime {
         Controllers::SimpleWeatherService& weatherService;
 
         lv_task_t* taskRefresh;
+        //remove these once they're gone from cpp file
         lv_font_t* font_dot40 = nullptr;
         lv_font_t* font_segment40 = nullptr;
         lv_font_t* font_segment115 = nullptr;
+        lv_obj_t* backgroundLabel;
       };
     }
 
@@ -126,6 +133,14 @@ namespace Pinetime {
                                                      controllers.filesystem);
       };
 
+      lv_obj_t* createShadowContainer(lv_obj_t*);
+      lv_obj_t* createMainLabel(lv_obj_t*, lv_color_t);
+      lv_obj_t* createShadowLabel(lv_obj_t*, lv_color_t);
+      
+      void alignShadowLabelRandom(lv_obj_t*, lv_obj_t*);
+      void alignShadowLabelConsistent(lv_obj_t*, lv_obj_t*);
+      void timeJitter(lv_obj_t*);
+      
       static bool IsAvailable(Pinetime::Controllers::FS& filesystem) {
         return Screens::WatchFaceCecil::IsAvailable(filesystem);
       }

@@ -1,0 +1,26 @@
+ADDING A FONT:
+	Files:  src/libs/lv_conf.h
+		src/displayapp/fonts/fonts.json
+		src/displayapp/fonts/CMakeLists.txt
+		
+	Changes:
+	- Add ttf/woff file to src/displayapp/fonts
+	- In src/libs/lv_conf.h, add to #define LV_FONT_CUSTOM_DECLARE (fill in font name)
+		
+		LV_FONT_DECLARE(font_name_20) \
+	
+	- In src/displayapp/fonts/fonts.json, add (fill in font name, file name, and desired size):
+
+		"font_name_20": {
+		    	"sources": [
+		    	{
+		    		"file": "FileName.ttf",
+		   		"range": "0x20-0x7e"
+		    	}
+			],
+		    	"bpp": 1,
+		    	"size": 20
+		    },
+		    
+	- In src/displayapp/fonts/CMakeLists.txt, add font name to list of fonts on line 1 (function set(FONTS args))
+	    

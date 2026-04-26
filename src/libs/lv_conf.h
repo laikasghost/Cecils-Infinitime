@@ -413,7 +413,10 @@ typedef void* lv_indev_drv_user_data_t;            /*Type of user data in the in
  *                                LV_FONT_DECLARE(my_font_2)
  */
 
-#define LV_FONT_CUSTOM_DECLARE LV_FONT_DECLARE(jetbrains_mono_bold_20) \
+#define LV_FONT_CUSTOM_DECLARE LV_FONT_DECLARE(bubble_80) \
+                               LV_FONT_DECLARE(pixel_20) \
+                               LV_FONT_DECLARE(pixel_30) \
+                               LV_FONT_DECLARE(jetbrains_mono_bold_20) \
                                LV_FONT_DECLARE(jetbrains_mono_extrabold_compressed) \
                                LV_FONT_DECLARE(jetbrains_mono_42) \
                                LV_FONT_DECLARE(jetbrains_mono_76) \

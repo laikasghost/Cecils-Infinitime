@@ -1,4 +1,34 @@
 {
+    "bubble_80": {
+    	"sources": [
+    	{
+    		"file": "MoiraiOne-Regular.ttf",
+   		"range": "0x20-0x7e"
+    	}
+	],
+    	"bpp": 1,
+    	"size": 80
+    },
+    "pixel_20": {
+    	"sources": [
+    	{
+    		"file": "Tiny5-Regular.ttf",
+   		"range": "0x20-0x7e"
+    	}
+	],
+    	"bpp": 1,
+    	"size": 20
+    },
+    "pixel_30": {
+    	"sources": [
+    	{
+    		"file": "Tiny5-Regular.ttf",
+   		"range": "0x20-0x7e"
+    	}
+	],
+    	"bpp": 1,
+    	"size": 30
+    },
    "jetbrains_mono_bold_20": {
       "sources": [
          {
