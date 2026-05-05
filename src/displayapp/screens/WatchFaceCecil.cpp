@@ -1,9 +1,7 @@
 //todo: 
-//figure out segfault
-//make functions to do all this shit
-//bottom bar step progress
-//colors
-//new font??? idk
+//make smaller
+//works better now that it is smaller, but not good enough to not crash, can pull up apps but not settings
+//how can i take out unnecessary items defined in constructor?
 #include "displayapp/screens/WatchFaceCecil.h"
 #include <lvgl/lvgl.h>
 #include <cstdio>
@@ -101,7 +99,6 @@ WatchFaceCecil::WatchFaceCecil(Controllers::DateTime& dateTimeController,
   lfs_file f = {};
   if (filesystem.FileOpen(&f, "/fonts/lv_font_dots_40.bin", LFS_O_RDONLY) >= 0) {
     filesystem.FileClose(&f);
-    font_dot40 = lv_font_load("F:/fonts/lv_font_dots_40.bin");
   }
   //end load-bearing garbage
 
@@ -148,7 +145,6 @@ WatchFaceCecil::WatchFaceCecil(Controllers::DateTime& dateTimeController,
   lv_obj_set_parent(steps_bar, big_container);
   lv_obj_align(steps_bar, lv_scr_act(), LV_ALIGN_IN_BOTTOM_LEFT, 0, -20);
   lv_obj_set_size(steps_bar, 240, 30);
-  lv_cont_set_layout(steps_bar, LV_LAYOUT_ROW_MID);
   lv_obj_set_style_local_bg_opa(steps_bar, LV_BAR_PART_BG, LV_STATE_DEFAULT, LV_OPA_20);
   lv_obj_set_style_local_bg_color(steps_bar, LV_BAR_PART_BG, LV_STATE_DEFAULT, color_contrast_background);
   lv_obj_set_style_local_bg_color(steps_bar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, color_contrast_background);
@@ -162,54 +158,20 @@ WatchFaceCecil::WatchFaceCecil(Controllers::DateTime& dateTimeController,
   //create bluetooth icon
   bleIcon = lv_label_create(lv_scr_act(), nullptr);
   lv_obj_set_parent(bleIcon, battery_bar);
-  lv_obj_align(bleIcon, battery_bar, LV_ALIGN_IN_RIGHT_MID, -6, 0);
+  lv_obj_align(bleIcon, battery_bar, LV_ALIGN_IN_LEFT_MID, 6, 0);
   lv_obj_set_style_local_text_color(bleIcon, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_main);
   lv_label_set_text_static(bleIcon, Symbols::bluetooth);
   
   //middle section items
-  //BEGIN DATE INFO ROW---
-  //date info container
-  date_info_container = lv_cont_create(lv_scr_act(), nullptr);
-  lv_obj_set_parent(date_info_container, middle_container);
-  lv_cont_set_layout(date_info_container, LV_LAYOUT_ROW_BOTTOM);
-  lv_cont_set_fit(date_info_container, LV_FIT_TIGHT); 
-  lv_obj_set_style_local_bg_opa(date_info_container, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
-  lv_obj_set_style_local_pad_all(date_info_container, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 0);
-  lv_obj_set_style_local_pad_inner(date_info_container, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 3);
-  lv_obj_set_style_local_margin_all(date_info_container, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 0);
-  
-  //DAY OF WEEK ---
-  //day of week shadow container
-  day_container = createShadowContainer(date_info_container);
-  //create day of week shadow label
-  label_day_shadow = createShadowLabel(day_container);
-  lv_label_set_text_static(label_day_shadow, "SUN");
-  //create day of week label
-  label_day = createMainLabel(label_day_shadow);
-  //---END DAY OF WEEK
-  
   //DATE ---
   //create date container
-  date_container = createShadowContainer(date_info_container);
+  date_container = createShadowContainer(middle_container);
   //create date shadow label
   label_date_shadow = createShadowLabel(date_container);
   lv_label_set_text_static(label_date_shadow, "6/30");
   //create date label
   label_date = createMainLabel(label_date_shadow);
   //---END DATE
-
-  /*
-  //WEEK NUMBER ---
-  //create week number container
-  week_container = createShadowContainer(date_info_container);
-  //create week number shadow label
-  label_week_shadow = createShadowLabel(week_container, color_line);
-  lv_label_set_text_static(label_week_shadow, "WK26");
-  //create week number label
-  label_week = createMainLabel(label_week_shadow, color_text);
-  //---END WEEK NUMBER
-  */
-  //---END DATE INFO ROW
 
   //WEATHER ---
   //create weather shadow container
@@ -235,41 +197,40 @@ WatchFaceCecil::WatchFaceCecil(Controllers::DateTime& dateTimeController,
   //--- END TIME
 
   //bottom bar items
+  fitness_data_container = lv_cont_create(lv_scr_act(), nullptr);
+  lv_cont_set_layout(fitness_data_container, LV_LAYOUT_ROW_MID);
+  lv_obj_set_parent(fitness_data_container, steps_bar);
+  lv_cont_set_fit(fitness_data_container, LV_FIT_TIGHT); 
+  lv_obj_set_style_local_radius(fitness_data_container, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, 0);
+  lv_obj_set_style_local_pad_inner(fitness_data_container, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 3);
+  lv_obj_set_style_local_pad_all(fitness_data_container, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 3);
+  lv_obj_set_style_local_pad_left(fitness_data_container, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 6);
+  lv_obj_set_style_local_margin_all(fitness_data_container, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 0);
+  lv_obj_set_style_local_bg_opa(fitness_data_container, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
+
   //HEARTBEAT---
-  //create heartbeat info container
-  heartbeat_container = createShadowContainer(steps_bar);
-  lv_cont_set_layout(heartbeat_container, LV_LAYOUT_ROW_MID);
-  lv_obj_align(heartbeat_container, steps_bar, LV_ALIGN_IN_LEFT_MID, 6, 0);
-  lv_obj_set_style_local_pad_inner(heartbeat_container, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, 3);
-  lv_obj_set_style_local_margin_left(heartbeat_container, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, 6);
   //create heartbeat icon label
   heartbeatIcon = lv_label_create(lv_scr_act(), nullptr);
-  lv_obj_set_parent(heartbeatIcon, heartbeat_container);
+  lv_obj_set_parent(heartbeatIcon, fitness_data_container);
   lv_label_set_text_static(heartbeatIcon, Symbols::heartBeat);
   lv_obj_set_style_local_text_color(heartbeatIcon, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_main);
   //create heartbeat value label
   heartbeatValue = lv_label_create(lv_scr_act(), nullptr);
-  lv_obj_set_parent(heartbeatValue, heartbeat_container);
+  lv_obj_set_parent(heartbeatValue, fitness_data_container);
   lv_obj_set_style_local_text_color(heartbeatValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_main);
   lv_obj_set_style_local_text_font(heartbeatValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &pixel_20);
   lv_label_set_text_static(heartbeatValue, "");
   //---END HEARTBEAT
 
   //STEPS---
-  //create step info container
-  step_container = createShadowContainer(steps_bar);
-  lv_cont_set_layout(step_container, LV_LAYOUT_ROW_MID);
-  lv_obj_align(step_container, steps_bar, LV_ALIGN_IN_RIGHT_MID, -20, 0);
-  lv_obj_set_style_local_pad_inner(step_container, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, 3);
-  lv_obj_set_style_local_margin_right(step_container, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, 6);
   //create step icon label
   stepIcon = lv_label_create(lv_scr_act(), nullptr);
-  lv_obj_set_parent(stepIcon, step_container);
+  lv_obj_set_parent(stepIcon, fitness_data_container);
   lv_obj_set_style_local_text_color(stepIcon, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_main);
   lv_label_set_text_static(stepIcon, Symbols::shoe);
   //create step value label
   stepValue = lv_label_create(lv_scr_act(), nullptr);
-  lv_obj_set_parent(stepValue, step_container);
+  lv_obj_set_parent(stepValue, fitness_data_container);
   lv_obj_set_style_local_text_color(stepValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_main);
   lv_obj_set_style_local_text_font(stepValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &pixel_20);
   lv_label_set_text_static(stepValue, "0");
@@ -336,36 +297,14 @@ void WatchFaceCecil::Refresh() {
 
       Controllers::DateTime::Months month = dateTimeController.Month();
       uint8_t day = dateTimeController.Day();
-      lv_label_set_text_fmt(label_date, "%d/%d", month, day);
-      if (settingsController.GetClockType() == Controllers::Settings::ClockType::H24) {
-        // 24h mode: mmddyyyy, first DOW=Monday;
-        //lv_label_set_text_fmt(label_date, "%d/%d", month, day);
-        weekNumberFormat = "%V"; // Replaced by the week number of the year (Monday as the first day of the week) as a decimal number
-                                 // [01,53]. If the week containing 1 January has four or more days in the new year, then it is considered
-                                 // week 1. Otherwise, it is the last week of the previous year, and the next week is week 1. Both January
-                                 // 4th and the first Thursday of January are always in week 1. [ tm_year, tm_wday, tm_yday]
-      } else {
-        // 12h mode: mmddyyyy, first DOW=Sunday;
-        //lv_label_set_text_fmt(label_date, "%d/%d", month, day);
-        weekNumberFormat = "%U"; // Replaced by the week number of the year as a decimal number [00,53]. The first Sunday of January is the
-                                 // first day of week 1; days in the new year before this are in week 0. [ tm_year, tm_wday, tm_yday]
-      }
-
       time_t ttTime =
         std::chrono::system_clock::to_time_t(std::chrono::time_point_cast<std::chrono::system_clock::duration>(currentDateTime.Get()));
       tm* tmTime = std::localtime(&ttTime);
 
       char buffer[8];
       strftime(buffer, 8, weekNumberFormat, tmTime);
-      //uint8_t weekNumber = atoi(buffer);
+      lv_label_set_text_fmt(label_date, "%s %d/%d", dateTimeController.DayOfWeekShortToStringLow(dateTimeController.DayOfWeek()), month, day);
 
-      lv_label_set_text_fmt(label_day, "%s", dateTimeController.DayOfWeekShortToStringLow(dateTimeController.DayOfWeek()));
-      //lv_label_set_text_fmt(label_week, "Week %02d", weekNumber);
-
-      lv_obj_realign(label_day);
-      alignShadowLabelConsistent(label_day, label_day_shadow);
-      //lv_obj_realign(label_week);
-      //alignShadowLabelConsistent(label_week, label_week_shadow);
       lv_obj_realign(label_date);
       alignShadowLabelConsistent(label_date, label_date_shadow);
     }
