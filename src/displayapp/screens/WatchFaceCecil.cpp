@@ -123,7 +123,7 @@ WatchFaceCecil::WatchFaceCecil(Controllers::DateTime& dateTimeController,
   lv_obj_set_size(battery_bar, 240, 30);
   lv_obj_set_style_local_bg_opa(battery_bar, LV_BAR_PART_BG, LV_STATE_DEFAULT, LV_OPA_20);
   lv_obj_set_style_local_bg_color(battery_bar, LV_BAR_PART_BG, LV_STATE_DEFAULT, color_contrast_background);
-  lv_obj_set_style_local_bg_color(battery_bar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, color_contrast_background);
+  lv_obj_set_style_local_bg_color(battery_bar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, color_secondary);
   lv_obj_set_style_local_radius(battery_bar, LV_BAR_PART_BG, LV_STATE_DEFAULT, 0);
   lv_obj_set_style_local_radius(battery_bar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, 0);
   lv_obj_set_style_local_margin_all(battery_bar, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 0);
@@ -147,7 +147,7 @@ WatchFaceCecil::WatchFaceCecil(Controllers::DateTime& dateTimeController,
   lv_obj_set_size(steps_bar, 240, 30);
   lv_obj_set_style_local_bg_opa(steps_bar, LV_BAR_PART_BG, LV_STATE_DEFAULT, LV_OPA_20);
   lv_obj_set_style_local_bg_color(steps_bar, LV_BAR_PART_BG, LV_STATE_DEFAULT, color_contrast_background);
-  lv_obj_set_style_local_bg_color(steps_bar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, color_contrast_background);
+  lv_obj_set_style_local_bg_color(steps_bar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, color_secondary);
   lv_obj_set_style_local_radius(steps_bar, LV_BAR_PART_BG, LV_STATE_DEFAULT, 0);
   lv_obj_set_style_local_radius(steps_bar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, 0);
   lv_obj_set_style_local_margin_all(steps_bar, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 0);
@@ -208,20 +208,6 @@ WatchFaceCecil::WatchFaceCecil(Controllers::DateTime& dateTimeController,
   lv_obj_set_style_local_margin_all(fitness_data_container, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, 0);
   lv_obj_set_style_local_bg_opa(fitness_data_container, LV_CONT_PART_MAIN, LV_STATE_DEFAULT, LV_OPA_TRANSP);
 
-  //HEARTBEAT---
-  //create heartbeat icon label
-  heartbeatIcon = lv_label_create(lv_scr_act(), nullptr);
-  lv_obj_set_parent(heartbeatIcon, fitness_data_container);
-  lv_label_set_text_static(heartbeatIcon, Symbols::heartBeat);
-  lv_obj_set_style_local_text_color(heartbeatIcon, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_main);
-  //create heartbeat value label
-  heartbeatValue = lv_label_create(lv_scr_act(), nullptr);
-  lv_obj_set_parent(heartbeatValue, fitness_data_container);
-  lv_obj_set_style_local_text_color(heartbeatValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_main);
-  lv_obj_set_style_local_text_font(heartbeatValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &pixel_20);
-  lv_label_set_text_static(heartbeatValue, "");
-  //---END HEARTBEAT
-
   //STEPS---
   //create step icon label
   stepIcon = lv_label_create(lv_scr_act(), nullptr);
@@ -235,6 +221,20 @@ WatchFaceCecil::WatchFaceCecil(Controllers::DateTime& dateTimeController,
   lv_obj_set_style_local_text_font(stepValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &pixel_20);
   lv_label_set_text_static(stepValue, "0");
   //---END STEPS
+
+  //HEARTBEAT---
+  //create heartbeat icon label
+  heartbeatIcon = lv_label_create(lv_scr_act(), nullptr);
+  lv_obj_set_parent(heartbeatIcon, fitness_data_container);
+  lv_label_set_text_static(heartbeatIcon, Symbols::heartBeat);
+  lv_obj_set_style_local_text_color(heartbeatIcon, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_main);
+  //create heartbeat value label
+  heartbeatValue = lv_label_create(lv_scr_act(), nullptr);
+  lv_obj_set_parent(heartbeatValue, fitness_data_container);
+  lv_obj_set_style_local_text_color(heartbeatValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_main);
+  lv_obj_set_style_local_text_font(heartbeatValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, &pixel_20);
+  lv_label_set_text_static(heartbeatValue, "");
+  //---END HEARTBEAT
   
   taskRefresh = lv_task_create(RefreshTaskCallback, LV_DISP_DEF_REFR_PERIOD, LV_TASK_PRIO_MID, this);
   Refresh();
@@ -258,9 +258,11 @@ void WatchFaceCecil::Refresh() {
   powerPresent = batteryController.IsPowerPresent();
   if (powerPresent.IsUpdated()) {
     if (batteryController.IsPowerPresent()) {
-      lv_obj_set_style_local_bg_color(battery_bar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, color_secondary);
+      lv_obj_set_style_local_bg_color(battery_bar, LV_BAR_PART_BG, LV_STATE_DEFAULT, color_contrast_background);
+      lv_obj_set_style_local_bg_opa(battery_bar, LV_BAR_PART_BG, LV_STATE_DEFAULT, LV_OPA_COVER);
     } else {
-      lv_obj_set_style_local_bg_color(battery_bar, LV_BAR_PART_INDIC, LV_STATE_DEFAULT, color_contrast_background);
+      lv_obj_set_style_local_bg_color(battery_bar, LV_BAR_PART_BG, LV_STATE_DEFAULT, color_contrast_background);
+      lv_obj_set_style_local_bg_opa(battery_bar, LV_BAR_PART_BG, LV_STATE_DEFAULT, LV_OPA_20);
     }
   }
 
@@ -336,10 +338,10 @@ void WatchFaceCecil::Refresh() {
   if (heartbeat.IsUpdated() || heartbeatRunning.IsUpdated()) {
     if (heartbeatRunning.Get()) {
       lv_label_set_text_fmt(heartbeatValue, "%d", heartbeat.Get());
-      lv_obj_set_style_local_text_color(heartbeatValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_main);
+      lv_label_set_text_static(heartbeatIcon, Symbols::heartBeat);
     } else {
       lv_label_set_text_static(heartbeatValue, "");
-      lv_obj_set_style_local_text_color(heartbeatValue, LV_LABEL_PART_MAIN, LV_STATE_DEFAULT, color_background);
+      lv_label_set_text_static(heartbeatIcon, "");
     }
 
     lv_obj_realign(heartbeatIcon);

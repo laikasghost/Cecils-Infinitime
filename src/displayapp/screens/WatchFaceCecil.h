@@ -56,10 +56,10 @@ namespace Pinetime {
         Utility::DirtyValue<std::chrono::time_point<std::chrono::system_clock, std::chrono::days>> currentDate;
         Utility::DirtyValue<std::optional<Controllers::SimpleWeatherService::CurrentWeather>> currentWeather {};
 
-        lv_color_t color_main = lv_color_hex(0xA84532); //main text color: clay
+        lv_color_t color_main = lv_color_hex(0xce4129); //main text color: clay
         lv_color_t color_secondary = lv_color_hex(0xD8F0FE); //secondary color: text shadows, etc?: white/v light blue
         lv_color_t color_background = lv_color_hex(0x7EBCE1); //sky blue
-        lv_color_t color_contrast_background = lv_color_hex(0x3C668A); //duller sky blue
+        lv_color_t color_contrast_background = lv_color_hex(0x4A8AAD); //duller sky blue
         
         //lv_style_t style_line;
 
