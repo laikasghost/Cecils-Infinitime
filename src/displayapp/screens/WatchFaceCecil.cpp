@@ -243,8 +243,7 @@ WatchFaceCecil::WatchFaceCecil(Controllers::DateTime& dateTimeController,
 WatchFaceCecil::~WatchFaceCecil() {
   lv_task_del(taskRefresh);
 
-  lv_style_reset(&style_line);
-  lv_style_reset(&style_border);
+  //lv_style_reset(&style_line); make styles eventually prob
 
   //more load-bearing garbage
   if (font_dot40 != nullptr) {

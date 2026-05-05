@@ -61,12 +61,11 @@ namespace Pinetime {
         lv_color_t color_background = lv_color_hex(0x7EBCE1); //sky blue
         lv_color_t color_contrast_background = lv_color_hex(0x3C668A); //duller sky blue
         
-        lv_style_t style_line;
-        lv_style_t style_border;
+        //lv_style_t style_line;
 
         lv_obj_t* big_container;
+        lv_obj_t* battery_bar;
         lv_obj_t* middle_container;
-        lv_obj_t* batt_info_container;
         lv_obj_t* fitness_data_container;
         lv_obj_t* time_container;
         lv_obj_t* label_time;
@@ -78,17 +77,12 @@ namespace Pinetime {
         lv_obj_t* label_weather;
         lv_obj_t* label_weather_shadow;
         lv_obj_t* bleIcon;
-        lv_obj_t* batteryPlug;
-        lv_obj_t* battery_bar;
-        lv_obj_t* label_battery_value;
         lv_obj_t* heartbeat_container;
         lv_obj_t* heartbeatIcon;
         lv_obj_t* heartbeatValue;
-        lv_obj_t* step_container;
         lv_obj_t* stepIcon;
         lv_obj_t* stepValue;
         lv_obj_t* steps_bar;
-        lv_obj_t* notificationIcon;
         lv_obj_t* weather;
 
         int stepsGoal = 6000;
