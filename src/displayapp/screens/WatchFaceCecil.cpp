@@ -21,10 +21,10 @@
 #include <stdio.h>
 using namespace Pinetime::Applications::Screens;
 
-lv_color_t color_main = lv_color_hex(0xA84532); //main text color: clay
-lv_color_t color_secondary = lv_color_hex(0xD8F0FE); //secondary color: text shadows, etc?: white/v light blue
-lv_color_t color_background = lv_color_hex(0x7EBCE1); //sky blue
-lv_color_t color_contrast_background = lv_color_hex(0x3C668A); //duller sky blue
+lv_color_t color_main = lv_color_hex(0xB58600); //main text color: goldenrod
+lv_color_t color_secondary = lv_color_hex(0xF7FFF7); //secondary color: text shadows, etc?: white/v light green
+lv_color_t color_background = lv_color_hex(0x4A6931); //moss green
+lv_color_t color_contrast_background = lv_color_hex(0x102800); //darker mossy green
 
 void alignShadowLabelRandom(lv_obj_t* mainLabel, lv_obj_t* shadowLabel) {
   int rand1 = rand() % 15 - 7;
